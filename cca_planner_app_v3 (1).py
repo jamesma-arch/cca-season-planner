@@ -413,10 +413,20 @@ master["Assigned Staff"] = master["Assigned Staff"].apply(lambda L:", ".join(L))
 master_csv=master.to_csv(index=False).encode("utf-8")
 st.download_button("Download Master CSV", master_csv, "master_with_assignments.csv", "text/csv")
 
-socs_cols=["Activity Name","Years","Day","Time","Price","Room","Max Students","Assigned Staff"]
-socs=master[socs_cols].copy()
-socs_csv=socs.to_csv(index=False).encode("utf-8")
-st.download_button("Download SOCS Import CSV (best‑effort)", socs_csv, "socs_import_activities.csv", "text/csv")
+# SOCS export (safe version, ignores missing columns)
+socs_cols = ["Activity Name", "Years", "Day", "Time", "Price", "Room", "Max Students", "Assigned Staff"]
+
+available_cols = [c for c in socs_cols if c in master.columns]
+
+socs = master[available_cols].copy()
+socs_csv = socs.to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    "Download SOCS Import CSV (best-effort)",
+    socs_csv,
+    "socs_import_activities.csv",
+    "text/csv"
+)
 
 # Excel pack
 handbook_sheets={f"{day}_{group}":df for (day,group), df in tabs.items()}
